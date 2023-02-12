@@ -34,7 +34,7 @@
 ## 3. Setting correct date and time in Mi Body Composition Scale 2
 - Launch Zepp Life App, go to scale (Profile > My devices > Mi Body Composition Scale 2);
 - Start scale and select Clear data in App;
-- Take a new weight measurement with App, App should synchronize date and time;
+- Take a new weight measurement with App, App should synchronize date and time (UTC);
 - Script import_data.sh detects time zone and includes this as a time offset;
 - If time is still not synchronized correctly, check NTP synchronization on server or change time offset in import_data.sh file (offset parameter);
 - You should also synchronize scale after replacing batteries;
