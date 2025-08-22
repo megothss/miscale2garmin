@@ -51,9 +51,9 @@ with open(path + '/user/miscale_backup.csv', 'r') as csv_file:
             weight = float(row[2])
             miimpedance = float(row[3])
             if s400_pulse == 'on':
-                pulse = int(row[5])
                 diastolic = int(30)
                 systolic = int(40)
+                pulse = int(row[5])
             break
 
 # Matching Garmin Connect account to weight
