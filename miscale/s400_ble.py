@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import subprocess
 import signal
 import argparse
 import asyncio
@@ -21,7 +22,7 @@ def safe_print(*args, **kwargs):
 
 safe_print("""
 ==========================================
-Export 2 Garmin Connect v3.4 (s400_ble.py)
+Export 2 Garmin Connect v3.5 (s400_ble.py)
 ==========================================
 """)
 
@@ -39,7 +40,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-a", default=ble_arg_hci)
 args = parser.parse_args()
 ble_arg_hci = args.a
-ble_arg_mac = os.popen(f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'").read().strip()
+hci_out = subprocess.check_output(["hcitool", "dev"], stderr=subprocess.DEVNULL).decode()
+ble_arg_mac = [line.split()[1] for line in hci_out.splitlines() if f"hci{ble_arg_hci}" in line][0]
 
 # Counters for slow/fast iteration detection
 time_slow = 0
