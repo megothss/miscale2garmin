@@ -82,7 +82,7 @@ $ cd export2garmin-master && sudo chmod 755 import_data.sh omron/omron_pairing.s
 $ /home/robert/export2garmin-master/import_data.sh
 
 =============================================
-Export 2 Garmin Connect v3.4 (import_data.sh)
+Export 2 Garmin Connect v3.5 (import_data.sh)
 =============================================
 
 18.07.2024-16:56:01 SYSTEM * Main process runs on PID: 000

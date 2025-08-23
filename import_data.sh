@@ -2,7 +2,7 @@
 
 # Version Info
 echo -e "\n============================================="
-echo -e "Export 2 Garmin Connect v3.4 (import_data.sh)"
+echo -e "Export 2 Garmin Connect v3.5 (import_data.sh)"
 echo -e "=============================================\n"
 
 # Blocking multiple instances of same script process
@@ -108,7 +108,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 		# Importing raw data from BLE, within same process and hci (Xiaomi Body Composition Scale S400)
 		elif [[ $ble_status == "ok" && $switch_s400 == "on" && $switch_s400_hci == "off" ]] ; then
 			echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
-			miscale_hci=$(echo $ble_check | grep -o 'hci.' | head -n 1)
+			miscale_hci=$(echo "$ble_check" | grep -o 'hci.' | grep -o '[0-9]' | head -n 1)
 			miscale_s400_ble=$(python3 -B $path/miscale/s400_ble.py -a $miscale_hci)
 			if echo $miscale_s400_ble | grep -q "failed" ; then
 				echo "$(timenow) MISCALE|S400 * Reading BLE data failed, check configuration"
@@ -140,7 +140,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 					fi
 					if [[ $ble_status == "ok" ]] ; then
 						echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
-						miscale_hci=$(echo $ble_check | grep -o 'hci.' | head -n 1)
+						miscale_hci=$(echo "$ble_check" | grep -o 'hci.' | grep -o '[0-9]' | head -n 1)
 						miscale_s400_ble=$(python3 -B $path/miscale/s400_ble.py -a $miscale_hci)
 						if echo $miscale_s400_ble | grep -q "failed" ; then
 							echo "$(timenow) MISCALE|S400 * Reading BLE data failed, check configuration"

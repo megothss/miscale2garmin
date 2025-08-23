@@ -65,7 +65,7 @@ $ sudo setcap 'cap_net_raw,cap_net_admin+eip' /usr/local/lib/python3.11/dist-pac
 $ python3 /home/robert/export2garmin-master/miscale/miscale_ble.py
 
 =============================================
-Export 2 Garmin Connect v3.4 (miscale_ble.py)
+Export 2 Garmin Connect v3.5 (miscale_ble.py)
 =============================================
 
 18.11.2023-23:23:30 * Checking if a BLE adapter is detected
@@ -80,7 +80,7 @@ Export 2 Garmin Connect v3.4 (miscale_ble.py)
 $ /home/robert/export2garmin-master/import_data.sh
 
 =============================================
-Export 2 Garmin Connect v3.4 (import_data.sh)
+Export 2 Garmin Connect v3.5 (import_data.sh)
 =============================================
 
 18.07.2024-16:56:01 SYSTEM * Main process runs on PID: 000
