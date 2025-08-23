@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import subprocess
 import argparse
 import time
 from datetime import datetime as dt
@@ -75,11 +76,11 @@ class miScale(btle.DefaultDelegate):
 
     # Verifying correct working of BLE adapter, max 3 times
     def restart_bluetooth(self):
-        os.system("sudo rfkill unblock bluetooth >/dev/null 2>&1")
+        subprocess.run(["rfkill", "unblock", "bluetooth"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1)
-        os.system("sudo modprobe btusb >/dev/null 2>&1")
+        subprocess.run(["modprobe", "btusb"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1)
-        os.system("sudo systemctl restart bluetooth.service >/dev/null 2>&1")
+        subprocess.run(["systemctl", "restart", "bluetooth.service"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1)
     def run(self):
         print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * Checking if a BLE adapter is detected")
@@ -88,18 +89,18 @@ class miScale(btle.DefaultDelegate):
         while ble_error < 3:
             ble_error += 1
             if ble_arg_hci2mac == "on":
-                if not os.popen(f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}'").read():
+                if not subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}'"], stderr=subprocess.DEVNULL).decode().strip():
                     print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * BLE adapter {ble_arg_mac} not detected, restarting bluetooth service")
                 else:
-                    ble_arg_hci_read = os.popen(f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}' | cut -c4").read().strip()
+                    ble_arg_hci_read = subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}' | cut -c4"], stderr=subprocess.DEVNULL).decode().strip()
                     ble_arg_mac_read = ble_arg_mac
                     ble_success = True
             else:
-                if not os.popen(f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'").read():
+                if not subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'"], stderr=subprocess.DEVNULL).decode().strip():
                     print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * BLE adapter hci{ble_arg_hci} not detected, restarting bluetooth service")
                 else:
                     ble_arg_hci_read = ble_arg_hci
-                    ble_arg_mac_read = os.popen(f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'").read().strip()
+                    ble_arg_mac_read = subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'"], stderr=subprocess.DEVNULL).decode().strip()
                     ble_success = True
             if ble_success == False:
                 self.restart_bluetooth()
@@ -129,9 +130,9 @@ class miScale(btle.DefaultDelegate):
                 break
             except btle.BTLEManagementError:
                 print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * Connection error, restarting BLE adapter hci{ble_arg_hci_read}({ble_arg_mac_read})")
-                os.system(f"sudo hciconfig hci{ble_arg_hci_read} down >/dev/null 2>&1")
+                subprocess.run(["hciconfig", f"hci{ble_arg_hci_read}", "down"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 time.sleep(1)
-                os.system(f"sudo hciconfig hci{ble_arg_hci_read} up >/dev/null 2>&1")
+                subprocess.run(["hciconfig", f"hci{ble_arg_hci_read}", "up"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 time.sleep(1)
         if con_error == 3 and not con_success:
             print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * Failed to connect to BLE adapter hci{ble_arg_hci_read}({ble_arg_mac_read}) by {con_error} attempts")
