@@ -85,24 +85,24 @@ class miScale(btle.DefaultDelegate):
     def run(self):
         print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * Checking if a BLE adapter is detected")
         ble_error = 0
-        ble_success = False
         while ble_error < 3:
             ble_error += 1
+            hci_out = subprocess.check_output(["hcitool", "dev"], stderr=subprocess.DEVNULL).decode()
             if ble_arg_hci2mac == "on":
-                if not subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}'"], stderr=subprocess.DEVNULL).decode().strip():
+                if ble_arg_mac not in hci_out:
                     print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * BLE adapter {ble_arg_mac} not detected, restarting bluetooth service")
                 else:
-                    ble_arg_hci_read = subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/{ble_arg_mac}/ {{print $1}}' | cut -c4"], stderr=subprocess.DEVNULL).decode().strip()
+                    ble_arg_hci_read = [line.split()[0][-1] for line in hci_out.splitlines() if ble_arg_mac in line][0]
                     ble_arg_mac_read = ble_arg_mac
                     ble_success = True
             else:
-                if not subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'"], stderr=subprocess.DEVNULL).decode().strip():
+                if f"hci{ble_arg_hci}" not in hci_out:
                     print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * BLE adapter hci{ble_arg_hci} not detected, restarting bluetooth service")
                 else:
                     ble_arg_hci_read = ble_arg_hci
-                    ble_arg_mac_read = subprocess.check_output(["bash", "-c", f"hcitool dev | awk '/hci{ble_arg_hci}/ {{print $2}}'"], stderr=subprocess.DEVNULL).decode().strip()
+                    ble_arg_mac_read = [line.split()[1] for line in hci_out.splitlines() if f"hci{ble_arg_hci}" in line][0]
                     ble_success = True
-            if ble_success == False:
+            if not ble_success:
                 self.restart_bluetooth()
             else:
                 print(f"{dt.now().strftime('%d.%m.%Y-%H:%M:%S')} * BLE adapter hci{ble_arg_hci_read}({ble_arg_mac_read}) detected, check BLE adapter connection")
