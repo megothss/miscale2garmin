@@ -257,7 +257,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			coproc ble { bluetoothctl; }
 			while true ; do
 				source <(grep omron_omblepy_ $path/user/export2garmin.cfg)
-				omron_hci=$(echo $ble_check | grep -o 'hci.' | head -n 1)
+				[[ $ble_check =~ (hci[0-9]+) ]] && omron_hci=${BASH_REMATCH[1]}
 				omron_omblepy_check=$(timeout ${omron_omblepy_time}s python3 -B $path/omron/omblepy.py -a $omron_hci -p -d $omron_omblepy_model 2> /dev/null)
 				if [[ $omron_omblepy_check == *"$omron_omblepy_mac"* ]] ; then
 
