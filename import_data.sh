@@ -110,7 +110,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
 			[[ $ble_check =~ hci([0-9]+) ]] && miscale_hci=${BASH_REMATCH[1]}
 			miscale_s400_ble=$(python3 -B $path/miscale/s400_ble.py -a $miscale_hci)
-			if echo $miscale_s400_ble | grep -q "failed" ; then
+			if [[ $miscale_s400_ble == *"failed"* ]] ; then
 				echo "$(timenow) MISCALE|S400 * Reading BLE data failed, check configuration"
 			else miscale_read=$(echo $miscale_s400_ble | awk '{sub(/.*BLE scan/, ""); print substr($1,1)}')
 
