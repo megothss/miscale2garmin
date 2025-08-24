@@ -33,7 +33,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 
 	# Restart WiFi if it crashed
 	if [[ $switch_wifi_watchdog == "on" ]] ; then
-		if nmcli -t -f WIFI g | grep -q "enabled" && nmcli -t -f ACTIVE dev wifi | grep -q "^yes" ; then
+		if [[ $(nmcli -t -f WIFI g) == *enabled* ]] && [[ $(nmcli -t -f ACTIVE dev wifi) == yes* ]] ; then
 			echo "$(timenow) SYSTEM * WiFi adapter working, go to verify BLE adapter"
 		else
 			echo "$(timenow) SYSTEM * WiFi adapter not working, restarting via nmcli"
@@ -49,10 +49,10 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			unset $(compgen -v | grep '^ble_')
 			echo "$(timenow) SYSTEM * BLE adapter is ON in export2garmin.cfg file, check if available"
 			ble_check=$(python3 -B $path/miscale/miscale_ble.py)
-			if echo $ble_check | grep -q "failed" ; then
+			if [[ $ble_check == *"failed"* ]] ; then
 				echo "$(timenow) SYSTEM * BLE adapter  not working, skip scanning check if temp.log file exists"
 			else ble_status=ok
-				hci_mac=$(echo $ble_check | grep -o 'h.\{21\})' | head -n 1)
+				[[ $ble_check =~ (h.{21}\)) ]] && hci_mac=${BASH_REMATCH[1]}
 				echo "$(timenow) SYSTEM * BLE adapter $hci_mac working, check if temp.log file exists"
 			fi
 		else echo "$(timenow) SYSTEM * BLE adapter is OFF or incorrect configuration in export2garmin.cfg file, check if temp.log file exists"
@@ -91,7 +91,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			source <(grep miscale_mqtt_ $path/user/export2garmin.cfg)
 			echo "$(timenow) MISCALE|S400 * Importing data from an MQTT broker"
 			miscale_read=$(mosquitto_sub -h localhost -t 'data' -u "$miscale_mqtt_user" -P "$miscale_mqtt_passwd" -C 1 -W 10)
-			miscale_unixtime=$(echo $miscale_read | cut -d ";" -f 1)
+			miscale_unixtime=${miscale_read%%;*}
 			if [[ -z $miscale_unixtime ]] ; then
 				echo "$(timenow) MISCALE|S400 * No MQTT data, check connection to MQTT broker or ESP32"
 			fi
@@ -99,16 +99,16 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 		# Importing raw data from BLE (Mi Body Composition Scale 2)
 		elif [[ $ble_status == "ok" && $switch_s400 == "off" ]] ; then
 			echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
-			if echo $ble_check | grep -q "incomplete" ; then
+			if [[ $ble_check == *"incomplete"* ]] ; then
 				echo "$(timenow) MISCALE|S400 * Reading BLE data incomplete, repeat weighing"
 			else miscale_read=$(echo $ble_check | awk '{sub(/.*BLE scan/, ""); print substr($1,1)}')
-				miscale_unixtime=$(echo $miscale_read | cut -d ";" -f 1)
+				miscale_unixtime=${miscale_read%%;*}
 			fi
 
 		# Importing raw data from BLE, within same process and hci (Xiaomi Body Composition Scale S400)
 		elif [[ $ble_status == "ok" && $switch_s400 == "on" && $switch_s400_hci == "off" ]] ; then
 			echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
-			miscale_hci=$(echo "$ble_check" | grep -o 'hci.' | grep -o '[0-9]' | head -n 1)
+			[[ $ble_check =~ hci([0-9]+) ]] && miscale_hci=${BASH_REMATCH[1]}
 			miscale_s400_ble=$(python3 -B $path/miscale/s400_ble.py -a $miscale_hci)
 			if echo $miscale_s400_ble | grep -q "failed" ; then
 				echo "$(timenow) MISCALE|S400 * Reading BLE data failed, check configuration"
@@ -132,17 +132,17 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 					source <(grep s400_arg_ $path/user/export2garmin.cfg)
 					echo "$(timenow) S400 * BLE adapter is ON in export2garmin.cfg file, check if available"
 					ble_check=$(python3 -B $path/miscale/miscale_ble.py -a $s400_arg_hci -bt $s400_arg_hci2mac -mac $s400_arg_mac)
-					if echo $ble_check | grep -q "failed" ; then
+					if [[ $ble_check == *"failed"* ]] ; then
 						echo "$(timenow) S400 * BLE adapter  not working, skip scanning"
 					else ble_status=ok
-							hci_mac=$(echo $ble_check | grep -o 'h.\{21\})' | head -n 1)
+							[[ $ble_check =~ h(.{21})\) ]] && hci_mac=${BASH_REMATCH[1]}
 						echo "$(timenow) S400 * BLE adapter $hci_mac working"
 					fi
 					if [[ $ble_status == "ok" ]] ; then
 						echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"
-						miscale_hci=$(echo "$ble_check" | grep -o 'hci.' | grep -o '[0-9]' | head -n 1)
+						[[ $ble_check =~ hci([0-9]+) ]] && miscale_hci=${BASH_REMATCH[1]}
 						miscale_s400_ble=$(python3 -B $path/miscale/s400_ble.py -a $miscale_hci)
-						if echo $miscale_s400_ble | grep -q "failed" ; then
+						if [[ $miscale_s400_ble == *failed* ]] ; then
 							echo "$(timenow) MISCALE|S400 * Reading BLE data failed, check configuration"
 						else miscale_read=$(echo $miscale_s400_ble | awk '{sub(/.*BLE scan/, ""); print substr($1,1)}')
 
@@ -197,7 +197,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 		fi
 
 		# Calculating data and upload to Garmin Connect, print to temp.log file
-		if grep -q "failed\|to_import" $miscale_backup ; then
+		if [[ $(<"$miscale_backup") == *failed* ]] || [[ $(<"$miscale_backup") == *to_import* ]] ; then
 			python3 -B $path/miscale/miscale_export.py > $temp_log 2>&1
 			miscale_import=$(awk -F ": " '/MISCALE /*/ Import data:/{print substr($2,1,10)}' $temp_log)
 			echo "$(timenow) MISCALE|S400 * Calculating data from import $miscale_import, upload to Garmin Connect"
@@ -206,11 +206,11 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 		# Handling errors from temp.log file
 		if [[ -z $miscale_import ]] ; then
 			echo "$(timenow) MISCALE|S400 * There is no new data to upload to Garmin Connect"
-		elif grep -q "MISCALE \* There" $temp_log ; then
+		elif [[ $(<"$temp_log") == *"MISCALE * There"* ]] ; then
 			echo "$(timenow) MISCALE|S400 * There is no user with given weight or undefined user email@email.com, check users section in export2garmin.cfg"
 			echo "$(timenow) MISCALE|S400 * Deleting import $miscale_import from miscale_backup.csv file"
 			sed -i "/$miscale_import/d" $miscale_backup
-		elif grep -q "Err" $temp_log ; then
+		elif [[ $(<"$temp_log") == *"Err"* ]] ; then
 			echo "$(timenow) MISCALE|S400 * Upload to Garmin Connect has failed, check temp.log for error details"
 			sed -i "s/to_import;$miscale_import/failed;$miscale_import/" $miscale_backup
 		else echo "$(timenow) MISCALE|S400 * Data upload to Garmin Connect is complete"
@@ -259,7 +259,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 				source <(grep omron_omblepy_ $path/user/export2garmin.cfg)
 				omron_hci=$(echo $ble_check | grep -o 'hci.' | head -n 1)
 				omron_omblepy_check=$(timeout ${omron_omblepy_time}s python3 -B $path/omron/omblepy.py -a $omron_hci -p -d $omron_omblepy_model 2> /dev/null)
-				if echo $omron_omblepy_check | grep -q $omron_omblepy_mac ; then
+				if [[ $omron_omblepy_check == *"$omron_omblepy_mac"* ]] ; then
 
 					# Adding an exception for selected models
 					if [[ $omron_omblepy_model == "hem-6232t" ]] || [[ $omron_omblepy_model == "hem-7530t" ]] ; then
@@ -291,7 +291,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 		fi
 
 		# Upload to Garmin Connect, print to temp.log file
-		if grep -q "failed\|to_import" $omron_backup ; then
+		if [[ $(<"$omron_backup") == *"failed"* ]] || [[ $(<"$omron_backup") == *"to_import"* ]] ; then
 			if [[ $switch_miscale == "on" ]] ; then
 				python3 -B $path/omron/omron_export.py >> $temp_log 2>&1
 			else python3 -B $path/omron/omron_export.py > $temp_log 2>&1
@@ -308,11 +308,11 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			omron_calc_data=$(awk -F ": " '/OMRON /*/ Calculated data:/{print $2}' $temp_log)
 			omron_os_unixtime=$(date +%s)
 			omron_time_shift=$(( $omron_os_unixtime - $omron_import ))
-			if grep -q "Err" $temp_log ; then
-				if grep -q "MISCALE \* Upload" $temp_log ; then
+			if [[ $(<"$temp_log") == *"Err"* ]] ; then
+				if [[ $(<"$temp_log") == *"MISCALE * Upload"* ]] ; then
 					echo "$(timenow) OMRON * Upload to Garmin Connect has failed, check temp.log file for error details"
 					sed -i "s/to_import;$omron_import/failed;$omron_import/" $omron_backup
-				elif grep -q "OMRON \* Upload" $temp_log ; then
+				elif [[ $(<"$temp_log") == *"OMRON * Upload"* ]] ; then
 					echo "$(timenow) OMRON * Data upload to Garmin Connect is complete"
 					echo "$(timenow) OMRON * Saving calculated data from import $omron_import to omron_backup.csv file"
 					sed -i "s/failed;$omron_import_data/uploaded;omron_cut_data;$omron_calc_data;$omron_time_shift/; s/to_import;$omron_import_data/uploaded;$omron_cut_data;$omron_calc_data;$omron_time_shift/" $omron_backup
