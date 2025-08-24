@@ -164,7 +164,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 			if [[ -n $miscale_unixtime ]] ; then
 				source <(grep miscale_time_ $path/user/export2garmin.cfg)
 				miscale_os_unixtime=$(date +%s)
-				miscale_time_zone=$(date +%z | cut -c1-3)
+				miscale_time_zone=$(printf '%.3s' "$(date +%z)")
 				miscale_offset_unixtime=$(( $miscale_unixtime + $miscale_time_zone * 3600 + $miscale_time_offset ))
 				miscale_time_shift=$(( $miscale_os_unixtime - $miscale_offset_unixtime ))
 				miscale_absolute_shift=${miscale_time_shift#-}
