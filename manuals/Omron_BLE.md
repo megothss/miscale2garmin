@@ -10,7 +10,7 @@
 - Check bluetooth adapter from support matrix [2.6.1.](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/about_BLE.md#261-ble-adapters-support-matrix);
 - Update your system and then install following packages:
 ```
-$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev
+$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev rfkill
 $ sudo pip3 install --upgrade bluepy garminconnect bleak terminaltables --break-system-packages
 ```
 - Modify file `sudo nano /etc/systemd/system/bluetooth.target.wants/bluetooth.service`:

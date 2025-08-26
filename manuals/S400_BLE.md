@@ -15,7 +15,7 @@
 - For Windows download latest version and run: https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor/releases/latest/download/token_extractor.exe
 - For Linux update your system and then install following packages:
 ```
-$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev libjpeg-dev
+$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev libjpeg-dev rfkill
 $ sudo pip3 install --upgrade bluepy garminconnect bleak xiaomi-ble requests pycryptodome charset-normalizer pillow --break-system-packages
 ```
 - Download and extract to your home directory and run token_extractor.py (e.g. "/home/robert/"):
@@ -57,7 +57,7 @@ Devices found for server "de" @ home "000000000000":
 - Purchase a low-cost USB bluetooth adapter, **currently required** for synchronization to work, check from support matrix [2.6.1.](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/about_BLE.md#261-ble-adapters-support-matrix);
 - Update your system and then install following packages (if you have not done so in section [2.3.1.](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/S400_BLE.md#231-getting-mac-address-and-ble-key-of-xiaomi-body-composition-scale-s400));
 ```
-$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev
+$ sudo apt update && sudo apt full-upgrade -y && sudo apt install -y wget python3 bc bluetooth python3-pip libglib2.0-dev procmail libssl-dev rfkill
 $ sudo pip3 install --upgrade bluepy garminconnect bleak xiaomi-ble --break-system-packages
 ```
 - Modify file `sudo nano /etc/systemd/system/bluetooth.target.wants/bluetooth.service`:
