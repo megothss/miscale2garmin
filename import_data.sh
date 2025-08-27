@@ -120,7 +120,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 				echo $miscale_read >> $miscale_backup
 			fi
 
-		# Importing raw data from BLE, within another process and hci (Xiaomi Body Composition Scale S400)
+		# Importing raw data from BLE, within separate process and hci (Xiaomi Body Composition Scale S400)
 		elif [[ $switch_bt == "on" && $switch_s400 == "on" && $switch_s400_hci == "on" ]] ; then
 			if lockfile -r 0 "$switch_temp_path/s400.lock" 2>/dev/null ; then
 				s400_proc() {
@@ -136,7 +136,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 						echo "$(timenow) S400 * BLE adapter  not working, skip scanning"
 					else ble_status=ok
 							[[ $ble_check =~ h(.{21})\) ]] && hci_mac=${BASH_REMATCH[1]}
-						echo "$(timenow) S400 * BLE adapter $hci_mac working"
+						echo "$(timenow) S400 * BLE adapter $hci_mac working, switch to a separate process"
 					fi
 					if [[ $ble_status == "ok" ]] ; then
 						echo "$(timenow) MISCALE|S400 * Importing data from a BLE adapter"

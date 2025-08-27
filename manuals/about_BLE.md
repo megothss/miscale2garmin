@@ -76,7 +76,7 @@ Export 2 Garmin Connect v3.4 (import_data.sh)
 05.08.2025-10:21:22 OMRON * Module is ON in export2garmin.cfg file
 05.08.2025-10:21:22 OMRON * omron_backup.csv file exists, checking for new data
 05.08.2025-10:21:22 OMRON * Importing data from a BLE adapter
-05.08.2025-10:21:22 S400 * BLE adapter hci0(00:00:00:00:00:00) working
+05.08.2025-10:21:22 S400 * BLE adapter hci0(00:00:00:00:00:00) working, switch to a separate process
 ```
 - Go to next part of instructions, select module:
   - [Miscale | Mi Body Composition Scale 2 - Debian 12](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/Miscale_BLE.md);
