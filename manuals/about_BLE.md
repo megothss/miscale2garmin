@@ -42,6 +42,7 @@ sudo reboot
 - Use command `sudo hciconfig -a` to locate BLE adapter, and then select type of identification:
 	- By HCI number, set parameter "ble_arg_hci";
 	- By MAC address, set parameter "ble_arg_hci2mac" to "on" and specify MAC addres in parameter "ble_arg_mac".
+- If you are using Omron integration, you must re-pair device with new BLE adapter, see section [2.4.3.](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/Omron_BLE.md#243-configuring-scripts)
 
 ### 2.6.4. Using two BLE adapters in parallel
 - First, you need to complete installation steps for Omron and Xiaomi Body Composition Scale S400;
