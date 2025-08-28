@@ -19,7 +19,7 @@
 - ATS2851 chipset has native support in Debian 12 operating system | Raspberry Pi OS no additional driver needed;
 - If you have a lot of bluetooth devices in area, it's a good idea to set an additional check, set ble_adapter_check parameter to "on" in `user/export2garmin.cfg`;
 - Script `miscale/miscale_ble.py` has implemented debug mode and recovery mechanisms for bluetooth, you can verify if everything is working properly;
-- If you are using a virtual machine, assign bluetooth adapter from tab Hardware > Add: USB device > Use USB Vendor/Device ID > Choose Device: > Passthrough a specific device (tested on Proxmox VE 8.3);
+- If you are using a virtual machine, assign bluetooth adapter from tab Hardware > Add: USB device > Use USB Vendor/Device ID > Choose Device: > Passthrough a specific device (tested on Proxmox VE 8-9);
 - RTL8761B chipset requires driver (for Raspberry Pi OS skip this step), install Realtek package and restart virtual machine:
 ```
 sudo apt install -y firmware-realtek
