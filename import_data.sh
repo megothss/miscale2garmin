@@ -130,7 +130,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 					# Verifying correct working of BLE, restart bluetooth service and device via miscale_ble.py
 					unset $(compgen -v | grep '^ble_')
 					source <(grep s400_arg_ $path/user/export2garmin.cfg)
-					echo "$(timenow) S400 * BLE adapter is ON in export2garmin.cfg file, check if available"
+					echo "$(timenow) S400 * A seperate BLE adapter is ON in export2garmin.cfg file, check if available"
 					ble_check=$(python3 -B $path/miscale/miscale_ble.py -a $s400_arg_hci -bt $s400_arg_hci2mac -mac $s400_arg_mac)
 					if [[ $ble_check == *"failed"* ]] ; then
 						echo "$(timenow) S400 * BLE adapter  not working, skip scanning"
