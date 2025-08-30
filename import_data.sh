@@ -135,7 +135,7 @@ while [[ $loop_count -eq 0 ]] || [[ $i -lt $loop_count ]] ; do
 					if [[ $ble_check == *"failed"* ]] ; then
 						echo "$(timenow) S400 * BLE adapter  not working, skip scanning"
 					else ble_status=ok
-							[[ $ble_check =~ (h.{21}\)) ]] && hci_mac=${BASH_REMATCH[1]}
+							[[ $ble_check =~ h(.{21})\) ]] && hci_mac=${BASH_REMATCH[1]}
 						echo "$(timenow) S400 * BLE adapter $hci_mac working"
 					fi
 					if [[ $ble_status == "ok" ]] ; then

@@ -19,7 +19,7 @@
 - ATS2851 chipset has native support in Debian 12 operating system | Raspberry Pi OS no additional driver needed;
 - If you have a lot of bluetooth devices in area, it's a good idea to set an additional check, set ble_adapter_check parameter to "on" in `user/export2garmin.cfg`;
 - Script `miscale/miscale_ble.py` has implemented debug mode and recovery mechanisms for bluetooth, you can verify if everything is working properly;
-- If you are using a virtual machine, assign bluetooth adapter from tab Hardware > Add: USB device > Use USB Vendor/Device ID > Choose Device: > Passthrough a specific device (tested on Proxmox VE 8.3);
+- If you are using a virtual machine, assign bluetooth adapter from tab Hardware > Add: USB device > Use USB Vendor/Device ID > Choose Device: > Passthrough a specific device (tested on Proxmox VE 8-9);
 - RTL8761B chipset requires driver (for Raspberry Pi OS skip this step), install Realtek package and restart virtual machine:
 ```
 sudo apt install -y firmware-realtek
@@ -42,6 +42,7 @@ sudo reboot
 - Use command `sudo hciconfig -a` to locate BLE adapter, and then select type of identification:
 	- By HCI number, set parameter "ble_arg_hci";
 	- By MAC address, set parameter "ble_arg_hci2mac" to "on" and specify MAC addres in parameter "ble_arg_mac".
+- If you are using Omron integration, you must re-pair device with new BLE adapter, see section [2.4.3.](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/Omron_BLE.md#243-configuring-scripts)
 
 ### 2.6.4. Using two BLE adapters in parallel
 - First, you need to complete installation steps for Omron and Xiaomi Body Composition Scale S400;
@@ -59,7 +60,7 @@ sudo reboot
 $ /home/robert/export2garmin-master/import_data.sh
 
 =============================================
-Export 2 Garmin Connect v3.4 (import_data.sh)
+Export 2 Garmin Connect v3.5 (import_data.sh)
 =============================================
 
 05.08.2025-10:21:19 SYSTEM * Main process runs on PID: 000
@@ -75,7 +76,7 @@ Export 2 Garmin Connect v3.4 (import_data.sh)
 05.08.2025-10:21:22 OMRON * Module is ON in export2garmin.cfg file
 05.08.2025-10:21:22 OMRON * omron_backup.csv file exists, checking for new data
 05.08.2025-10:21:22 OMRON * Importing data from a BLE adapter
-05.08.2025-10:21:22 S400 * BLE adapter hci0(00:00:00:00:00:00) working
+05.08.2025-10:21:22 S400 * BLE adapter hci0(00:00:00:00:00:00) working, switch to a separate process
 ```
 - Go to next part of instructions, select module:
   - [Miscale | Mi Body Composition Scale 2 - Debian 12](https://github.com/RobertWojtowicz/export2garmin/blob/master/manuals/Miscale_BLE.md);
